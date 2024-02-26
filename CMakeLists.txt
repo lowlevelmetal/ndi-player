@@ -16,7 +16,10 @@ include_directories(${GLFW3_INCLUDE_DIRS})
 
 # Define sources
 set(SOURCES
-    src/ndi-player.cpp)
+    src/ndi-player.cpp
+    src/glfw.cpp
+    src/glfwerror.cpp
+    src/glfwwindow.cpp)
 
 # Define executable
 add_executable(ndiplayer ${SOURCES})
