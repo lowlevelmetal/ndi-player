@@ -22,6 +22,8 @@ namespace Window {
                 return std::string("Tried to preform operation on uninitialized window");
             case GlfwErrorCode::WindowClosed:
                 return std::string("Window is closed");
+            case GlfwErrorCode::WindowInitialized:
+                return std::string("Window initialized");
         }
 
         return std::string("Invalid GLFW error code");

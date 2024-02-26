@@ -17,7 +17,8 @@ namespace Window {
         GlfwInit,
         CreateWindow,
         WindowUninitialized,
-        WindowClosed
+        WindowClosed,
+        WindowInitialized
     };
 
     std::string GlfwErrorStr(GlfwErrorCode &err);

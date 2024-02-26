@@ -26,6 +26,7 @@ namespace Window {
             GlfwErrorCode SetDimensions(int width, int height);
             GlfwErrorCode PollEvents();
             void CloseWindow();
+            GlfwErrorCode OpenWindow(std::string &window_name, int width, int height);
 
         private:
             GLFWwindow *m_glfw_window = nullptr;

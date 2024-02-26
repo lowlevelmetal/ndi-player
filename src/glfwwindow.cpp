@@ -19,14 +19,26 @@ namespace Window {
         }
 
         // Create window
-        if(!(m_glfw_window = glfwCreateWindow(width, height, window_name.c_str(), nullptr, nullptr))) {
-            err = GlfwErrorCode::CreateWindow;
+        if((err = OpenWindow(window_name, width, height)) != GlfwErrorCode::NoError) {
             ERROR("%s", GlfwErrorStr(err).c_str());
         }
     }
 
     GLFWWindow::~GLFWWindow() {
         CloseWindow();
+    }
+
+    GlfwErrorCode GLFWWindow::OpenWindow(std::string &window_name, int width, int height) {
+        // Check if window is already open
+        if(m_glfw_window)
+            return GlfwErrorCode::WindowInitialized;
+        
+        // Create window
+        if(!(m_glfw_window = glfwCreateWindow(width, height, window_name.c_str(), nullptr, nullptr))) {
+            return (err = GlfwErrorCode::CreateWindow);
+        }
+        
+        return GlfwErrorCode::NoError;
     }
 
     GlfwErrorCode GLFWWindow::MakeGLContextCurrent() {
