@@ -51,13 +51,13 @@ namespace AV {
         if(!mdns && !sender_id)
             auto_select = true;
         else if(mdns && !sender_id)
-            return AvErrorCode::InvalidConfiguration;
+            return (last_error = AvErrorCode::InvalidConfiguration);
         else if(sender_id && !mdns)
-            return AvErrorCode::InvalidConfiguration;
+            return (last_error = AvErrorCode::InvalidConfiguration);
 
         NDIlib_find_instance_t pNDI_find = NDIlib_find_create_v2();
         if(!pNDI_find)
-            return AvErrorCode::CreateFindInstance;
+            return (last_error = AvErrorCode::CreateFindInstance);
 
         // Look for a server to connect to
         AvErrorCode ret = AvErrorCode::NoError;
@@ -97,7 +97,7 @@ END:
         if(pNDI_find)
             NDIlib_find_destroy(pNDI_find);
 
-        return ret;
+        return (last_error = ret);
     }
 
 } // namespace AV

@@ -8,8 +8,11 @@
 
 #pragma once
 
+// local includes
+#include "glew.hpp"
+
 namespace Render {
-    class GLVideoRenderer {
+    class GLVideoRenderer : public GLEW {
 
     };
 }
