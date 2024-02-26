@@ -46,6 +46,11 @@ ERRORTYPE ParseCommandLineArguments(COMMANDLINEARGUMENTS &cmdlineargs, int argc,
         }
     }
 
+    if(cmdlineargs.mdns == "" && cmdlineargs.source != "")
+        return FAILED;
+    else if(cmdlineargs.source == "" && cmdlineargs.mdns != "")
+        return FAILED;
+
     return SUCCESSFUL;
 }
 
@@ -63,7 +68,7 @@ int main(int argc, char **argv) {
     std::shared_ptr<Window::GLFWWindow> window;
 
     // Create NDI Reciever
-    if(cmdlineargs.mdns == "" && cmdlineargs.source == "") {
+    if(cmdlineargs.mdns == "") {
         ndi_reciever = std::make_shared<AV::NDIReciever>();
     } else {
         ndi_reciever = std::make_shared<AV::NDIReciever>(cmdlineargs.mdns, cmdlineargs.source);
