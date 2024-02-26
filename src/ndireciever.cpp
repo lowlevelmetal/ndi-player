@@ -15,7 +15,17 @@
 
 namespace AV {
 
-    NDIReciever::NDIReciever() : NDI() {
+    // Thread functions
+    void NDIReciever::m_VideoThread(NDIlib_recv_instance_t pNDI_recv,  std::atomic<bool> &shutdown) {
+        DEBUG("Video thread launched");
+
+        while(!shutdown) {
+            DEBUG("Grabbing frame");
+        }
+
+    }
+
+    NDIReciever::NDIReciever() : NDI(), m_shutdown(false) {
         if(last_error != AvErrorCode::NoError) {
             DEBUG("Error detected in NDI init");
             return;
@@ -25,9 +35,11 @@ namespace AV {
             DEBUG("Error detected in FindInstanceAndCreate");
             return;
         }
+
+        m_video_thread = std::make_shared<std::thread>(m_VideoThread, m_pNDI_recv, std::ref(m_shutdown));
     }
 
-    NDIReciever::NDIReciever(std::string mdns, std::string sender_id) : NDI() {
+    NDIReciever::NDIReciever(std::string mdns, std::string sender_id) : NDI(), m_shutdown(false) {
         if(last_error != AvErrorCode::NoError) {
             DEBUG("Error detected in NDI init");
             return;
@@ -38,9 +50,15 @@ namespace AV {
             return;
         }
 
+        m_video_thread = std::make_shared<std::thread>(m_VideoThread, m_pNDI_recv, std::ref(m_shutdown));
     }
 
     NDIReciever::~NDIReciever() {
+        m_shutdown = true;
+
+        if(m_video_thread)
+            m_video_thread->join();
+
         if(m_pNDI_recv)
             NDIlib_recv_destroy(m_pNDI_recv);
     }

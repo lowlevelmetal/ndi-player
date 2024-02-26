@@ -10,6 +10,9 @@
 
 // Standard includes
 #include <string>
+#include <memory>
+#include <thread>
+#include <atomic>
 
 // local includes
 #include "ndi.hpp"
@@ -24,9 +27,12 @@ namespace AV {
             ~NDIReciever();
 
         private:
+            std::atomic<bool> m_shutdown;
             NDIlib_recv_instance_t m_pNDI_recv = nullptr;
+            std::shared_ptr<std::thread> m_video_thread;
 
             AvErrorCode m_FindInstanceAndCreate(const char *const mdns = nullptr, const char *const sender_id = nullptr);
+            static void m_VideoThread(NDIlib_recv_instance_t pNDI_recv, std::atomic<bool> &shutdown);
     };
 
 }
