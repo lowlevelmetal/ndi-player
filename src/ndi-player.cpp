@@ -41,7 +41,6 @@ ERRORTYPE ParseCommandLineArguments(COMMANDLINEARGUMENTS &cmdlineargs, int argc,
                 cmdlineargs.source = std::string(optarg);
                 break;
             case 'h':
-                return FAILED;
             default:
                 return FAILED;
         }
@@ -58,9 +57,12 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    // Create ndi reciever
-    AV::AvErrorCode averr; 
+    AV::AvErrorCode averr;
+    Window::GlfwErrorCode werr;
     std::shared_ptr<AV::NDIReciever> ndi_reciever;
+    std::shared_ptr<Window::GLFWWindow> window;
+
+    // Create NDI Reciever
     if(cmdlineargs.mdns == "" && cmdlineargs.source == "") {
         ndi_reciever = std::make_shared<AV::NDIReciever>();
     } else {
@@ -71,16 +73,17 @@ int main(int argc, char **argv) {
         FATAL("%s", AV::AvErrorStr(averr).c_str());
 
     // Create window
-    Window::GLFWWindow window;
-    if(window.GetLastError() != Window::GlfwErrorCode::NoError)
-        FATAL("Failed to create window");
+    window = std::make_shared<Window::GLFWWindow>();
+    if((werr = window->GetLastError()) != Window::GlfwErrorCode::NoError)
+        FATAL("%s", Window::GlfwErrorStr(werr).c_str());
 
     // Main loop
-    Window::GlfwErrorCode ret;
-    while((ret = window.PollEvents()) == Window::GlfwErrorCode::NoError);
+    while((werr = window->PollEvents()) == Window::GlfwErrorCode::NoError) {
 
-    if(ret != Window::GlfwErrorCode::WindowClosed) {
-        FATAL("%s", Window::GlfwErrorStr(ret).c_str());
+    }
+
+    if(werr != Window::GlfwErrorCode::WindowClosed) {
+        FATAL("%s", Window::GlfwErrorStr(werr).c_str());
     }
 
     return EXIT_SUCCESS;
