@@ -6,6 +6,9 @@
  * Matthew Todd Geiger
  */
 
+// Standard includes
+#include <cstring>
+
 // Local includes
 #include "framebuffer.hpp"
 
@@ -119,6 +122,14 @@ namespace Render {
         
         m_inherited = false;
         m_framebuffer = nullptr;
+    }
+
+    void YUV422FrameBuffer::Copy(size_t width, size_t height, uint8_t *framebuffer) {
+        size_t size = (width * 2) * height;
+        if(size > m_size)
+            throw RenderErrorCode::OutOfBounds;
+
+        memcpy(m_framebuffer, framebuffer, size);
     }
 
 } // namespace Render

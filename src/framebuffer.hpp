@@ -32,6 +32,7 @@ namespace Render {
             void Dealloc();
             void Inherit(size_t width, size_t height, uint8_t *framebuffer);
             void Uninherit();
+            void Copy(size_t width, size_t height, uint8_t *framebuffer);
             bool IsInitialized();
             
             // I want to be able to access framebuffer data like a generic pointer

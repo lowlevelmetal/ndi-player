@@ -19,21 +19,38 @@ namespace AV {
     void NDIReciever::m_VideoThread(NDIlib_recv_instance_t pNDI_recv,  std::atomic<bool> &shutdown, Render::YUV422FrameBuffer &m_frame_buffer) {
         DEBUG("Video thread launched");
 
+        uint frame_count = 0;
         while(!shutdown) {
-            static NDIlib_video_frame_v2_t video_frame;
+            NDIlib_video_frame_v2_t video_frame;
 
             if(NDIlib_recv_capture_v2(pNDI_recv, &video_frame, nullptr, nullptr, 5000) != NDIlib_frame_type_video) {
                 ERROR("Failed to capture video frame");
                 continue;
             }
 
+            if(video_frame.FourCC != NDIlib_FourCC_video_type_UYVY) {
+                ERROR("Unsupported pixel format");
+                goto END;
+            }
+
             DEBUG("Captured Video Frame\n"
+                    "\tFrame: %d\n"
                     "\tWidth: %d\n"
-                    "\tHeight: %d\n\n", video_frame.xres, video_frame.yres);
+                    "\tHeight: %d\n\n", frame_count, video_frame.xres, video_frame.yres);
+
+            frame_count++;
 
             m_frame_buffer.Lock();
-            m_frame_buffer.Inherit(video_frame.xres, video_frame.yres, video_frame.p_data);
+            if(m_frame_buffer.resx != video_frame.yres || m_frame_buffer.resy != video_frame.yres) {
+                m_frame_buffer.Dealloc();
+                m_frame_buffer.Alloc(video_frame.xres, video_frame.yres);
+            }
+
+            m_frame_buffer.Copy(video_frame.xres, video_frame.yres, video_frame.p_data);
             m_frame_buffer.Unlock();
+
+END:
+            NDIlib_recv_free_video_v2(pNDI_recv, &video_frame);
         }
 
     }
