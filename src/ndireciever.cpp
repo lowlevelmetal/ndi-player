@@ -16,11 +16,24 @@
 namespace AV {
 
     // Thread functions
-    void NDIReciever::m_VideoThread(NDIlib_recv_instance_t pNDI_recv,  std::atomic<bool> &shutdown) {
+    void NDIReciever::m_VideoThread(NDIlib_recv_instance_t pNDI_recv,  std::atomic<bool> &shutdown, Render::YUV422FrameBuffer &m_frame_buffer) {
         DEBUG("Video thread launched");
 
         while(!shutdown) {
-            DEBUG("Grabbing frame");
+            static NDIlib_video_frame_v2_t video_frame;
+
+            if(NDIlib_recv_capture_v2(pNDI_recv, &video_frame, nullptr, nullptr, 5000) != NDIlib_frame_type_video) {
+                ERROR("Failed to capture video frame");
+                continue;
+            }
+
+            DEBUG("Captured Video Frame\n"
+                    "\tWidth: %d\n"
+                    "\tHeight: %d\n\n", video_frame.xres, video_frame.yres);
+
+            m_frame_buffer.Lock();
+            m_frame_buffer.Inherit(video_frame.xres, video_frame.yres, video_frame.p_data);
+            m_frame_buffer.Unlock();
         }
 
     }
@@ -36,7 +49,7 @@ namespace AV {
             return;
         }
 
-        m_video_thread = std::make_shared<std::thread>(m_VideoThread, m_pNDI_recv, std::ref(m_shutdown));
+        m_video_thread = std::make_shared<std::thread>(m_VideoThread, m_pNDI_recv, std::ref(m_shutdown), std::ref(m_frame_buffer));
     }
 
     NDIReciever::NDIReciever(std::string mdns, std::string sender_id) : NDI(), m_shutdown(false) {
@@ -50,7 +63,7 @@ namespace AV {
             return;
         }
 
-        m_video_thread = std::make_shared<std::thread>(m_VideoThread, m_pNDI_recv, std::ref(m_shutdown));
+        m_video_thread = std::make_shared<std::thread>(m_VideoThread, m_pNDI_recv, std::ref(m_shutdown), std::ref(m_frame_buffer));
     }
 
     NDIReciever::~NDIReciever() {

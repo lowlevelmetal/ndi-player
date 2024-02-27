@@ -15,7 +15,10 @@ namespace Render {
 
     enum class RenderErrorCode {
         NoError,
-        GlewInit
+        GlewInit,
+        OutOfBounds,
+        UninitializedFramebuffer,
+        InitializedFramebuffer
     };
 
     std::string RenderErrorStr(RenderErrorCode &err);

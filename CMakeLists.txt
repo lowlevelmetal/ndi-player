@@ -39,7 +39,8 @@ set(SOURCES
     src/ndireciever.cpp
     src/glvideorenderer.cpp
     src/glew.cpp
-    src/averror.cpp)
+    src/averror.cpp
+    src/framebuffer.cpp)
 
 # Define executable
 add_executable(ndiplayer ${SOURCES})
